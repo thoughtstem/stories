@@ -1,5 +1,8 @@
 #lang racket
 
+(provide stories->site
+         (all-from-out "./paths.rkt"))
+
 (require (except-in website/bootstrap time))
 (require stories/base 
          "./paths.rkt"
@@ -13,10 +16,10 @@
                        #:renderer (renderer (standard-renderer))
                        . stories)
 
-  (parameterize ([all-places places]
-                 [all-characters characters]
-                 [all-times times]
-                 [all-stories stories])
+  (parameterize ([all-places (flatten places)]
+                 [all-characters (flatten characters)]
+                 [all-times (flatten times)]
+                 [all-stories (flatten stories)])
 
     (define index-page (page index.html
                              (renderer 'index)))
@@ -25,10 +28,10 @@
       (list
         (bootstrap-files)
         index-page
-        (places->pages renderer places)
-        (characters->pages renderer characters)
-        (times->pages renderer times)
-        (stories->pages renderer stories)))))
+        (places->pages renderer (flatten places))
+        (characters->pages renderer (flatten characters))
+        (times->pages renderer (flatten times))
+        (stories->pages renderer (flatten stories))))))
 
 (module+ test
   (define neighborhood     

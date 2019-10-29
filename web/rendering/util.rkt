@@ -7,7 +7,8 @@
          all-stories
          listing)
 
-(require (except-in website/bootstrap time))
+(require (except-in website/bootstrap time)
+         gregor)
 (require stories/base 
          "../paths.rkt"
          "./map.rkt"
@@ -39,7 +40,8 @@
 
   (list 
     (h1 (place-name place))
-    (place-map (all-places) place)
+    ;(place-map (all-places) place)
+    (data-wrap (place-data place))
     (listing "Nearby Places" link-to-place
              (filter (curry places-nearby? place)
                (remove place (all-places))))
@@ -55,14 +57,20 @@
 
   (list 
     (h1 (time-name time))
-    (timeline (all-times) time)
+    ;(timeline (all-times) time)
+    (data-wrap (time-data time))
     (listing "Places with stories at this time" link-to-place
              (map story-place stories-now))  
     (listing "Characters with stories at this time" link-to-character
              (flatten (map story-characters stories-now)))  
+
     (listing "Overlapping Times" link-to-time
-             (filter (curry times-overlap? time) 
-                     (remove time (all-times))))
+             (filter 
+               (curry times-overlap? 
+                      #:lte moment<=?
+                      #:gte moment>=? time) 
+               (remove time (all-times))))
+
     (listing "Stories during this time" link-to-story
              stories-now)))
 
@@ -71,6 +79,7 @@
   (list 
     (h1 (character-name character))
     
+    (data-wrap (character-data character))
     (listing "Places character appears" link-to-place
              (map story-place stories-about))  
     (listing "Related characters" link-to-character
@@ -83,7 +92,17 @@
 
 (define (render-story story)
   (list 
-    (h1 (story-name story))))
+    (h1 (story-name story))
+    (h2 "Place")
+    (link-to-place (story-place story))  
+    (h2 "Time")
+    (link-to-time (story-time story))  
+    (listing "Characters" link-to-character
+             (story-characters story))
+    (data-wrap (story-data story))))
+
+(define (data-wrap d)
+  (container d))
 
 (define (standard-renderer)
   (lambda (thing) 
