@@ -37,7 +37,7 @@
   (define neighborhood     
     (place "Neighborhood"     
            (posn 0 0)
-           (posn 100 100)))
+           (posn 50 50)))
 
   (define bobs-house   (place "Bob's House" 
                               (posn 25 25)

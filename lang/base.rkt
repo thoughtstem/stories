@@ -1,6 +1,8 @@
 #lang at-exp racket
 
 (provide (except-out (struct-out place) place)
+         place-width place-height
+
          (except-out (struct-out character) character) 
          (except-out (struct-out time) time) 
          (except-out (struct-out story) story) 
@@ -39,6 +41,14 @@
   (place name data 
          (or posn (first posns)) 
          (or posn2 (second posns))))
+
+(define (place-width p)
+  (- (posn-x (place-posn2 p))
+     (posn-x (place-posn p))))
+
+(define (place-height p)
+  (- (posn-y (place-posn2 p))
+     (posn-y (place-posn p))))
 
 (define (make-character name #:data (data #f))
   (character name data))
