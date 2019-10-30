@@ -107,6 +107,7 @@
 (define (standard-renderer)
   (lambda (thing) 
     (content
+      (navbar #:brand "home")
       (container
         (cond
           [(eq? thing 'index) (index)]
