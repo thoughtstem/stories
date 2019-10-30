@@ -17,6 +17,7 @@
 
          (struct-out posn)
          
+         story-flatten-links
          times-overlap?
          places-nearby?  )
 
@@ -60,7 +61,9 @@
                     #:place place 
                     #:time time 
                     #:characters characters 
-                    #:data (data #f) #:links (links '()))
+                    #:data (data #f) 
+                    #:links (links '()))
+  (->* (string? #:place place? #:time time? #:characters (listof character?)) (#:data any/c) story?)
   (story name data place time characters links))
 
 (define (make-story-link next-story #:data (data #f))
@@ -105,5 +108,16 @@
 
 (define (places-nearby? p1 p2 #:radius (radius 20))
   (< (distance p1 p2) radius))
+
+
+
+(define (story-flatten-links s)
+  (if (empty? (story-links s)) 
+    (list s)  
+    (cons s (map story-flatten-links (story-links s)))))
+
+
+
+
 
 

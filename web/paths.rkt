@@ -104,9 +104,13 @@
 
 
 (define (stories->pages renderer stories)
+  (define all-stories
+    (flatten 
+      (map story-flatten-links stories))) 
+
+
   (map make-story-page
-       stories
-       (map renderer
-            stories)))
+       all-stories
+       (map renderer all-stories)))
 
 

@@ -99,7 +99,9 @@
     (link-to-time (story-time story))  
     (listing "Characters" link-to-character
              (story-characters story))
-    (data-wrap (story-data story))))
+    (data-wrap (story-data story))
+    (listing "Linked Stories" link-to-story
+             (story-links story))))
 
 (define (data-wrap d)
   (container d))

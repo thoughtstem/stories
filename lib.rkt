@@ -30,12 +30,13 @@
   (define characters     (dynamic-require path 'characters)) 
   (define time           (dynamic-require path 'time)) 
   (define content        (dynamic-require path 'content)) 
-  (define story-links    (dynamic-require path 'story-links)) 
+  (define story-links    (dynamic-require path 'links)) 
 
   (story title
          #:place place
          #:time time
          #:characters characters
+         #:links story-links
          #:data content))
 
 
