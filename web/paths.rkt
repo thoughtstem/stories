@@ -17,7 +17,11 @@
   make-character-page
   make-time-page
   make-story-page
-  urlify)
+  urlify
+  
+  ;Overridable configs (TODO: Doc)
+  time->link-content
+  )
 
 (require stories/base)
 (require (except-in website/bootstrap time))
@@ -56,10 +60,12 @@
     (character-path p)
     (character-name p)))
 
+(define time->link-content (make-parameter (lambda (t)
+                                             (~a (time-name t)))))
 (define (link-to-time p)
   (link-to
     (time-path p)
-    (time-name p)))
+    ((time->link-content) p)))
 
 (define (link-to-story p)
   (link-to
