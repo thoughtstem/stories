@@ -5,7 +5,11 @@
   place-from
   character-from
   time-from
-  story-from)
+  story-from
+  path->place
+  path->character
+  path->time
+  path->story)
 
 (require syntax/parse/define
          stories/base
