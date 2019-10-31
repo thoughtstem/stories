@@ -19,6 +19,7 @@
          
          story-flatten-links
          times-overlap?
+         time-named?
          places-nearby?  )
 
 (require posn)
@@ -93,6 +94,8 @@
     (in-time? lte gte t2 s1)
     (in-time? lte gte t2 s1)))
 
+(define (time-named? t)
+  (not (string=? "" (time-name t))))
 
 (define (distance p1 p2)
   (define p1-p (place-posn p1))

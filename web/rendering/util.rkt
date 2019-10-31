@@ -22,8 +22,22 @@
 (define (listing header link-f things)
   (when (not (empty? things))
     (list
-      (h2 header)
-      (map (compose div link-f) things))))
+      (if (string? header)
+        (h2 header)
+        header)
+      (ul
+        (map (compose li link-f) things)))))
+
+(define (card-listing header link things)
+  (when (not (empty? things))
+    (card
+      (card-body
+        (listing (card-title header) link
+                 things)))))
+
+(define (cols #:kind (kind col) . elements)
+  (map kind 
+       (filter-not void? elements)))
 
 (define (index)
   (list
@@ -41,15 +55,22 @@
   (list 
     (h1 (place-name place))
     ;(place-map (all-places) place)
+    (container
+      (row
+        (cols
+          (card-listing "Nearby Places" link-to-place
+                        (filter (curry places-nearby? place)
+                                (remove place (all-places)))) 
+          (card-listing "Characters here" link-to-character
+                        (flatten (map story-characters stories-here))) 
+
+          (card-listing "Times of stories here" link-to-time
+                        (map story-time stories-here)) 
+
+          (card-listing "Stories here" link-to-story stories-here)) ))
+    
     (data-wrap (place-data place))
-    (listing "Nearby Places" link-to-place
-             (filter (curry places-nearby? place)
-               (remove place (all-places))))
-    (listing "Characters here" link-to-character
-             (flatten (map story-characters stories-here)))
-    (listing "Times of stories here" link-to-time
-             (map story-time stories-here))
-    (listing "Stories here" link-to-story stories-here))) 
+    )) 
 
 (define (render-time time)
   (define stories-now
@@ -57,48 +78,72 @@
 
   (list 
     (h1 (time-name time))
-    ;(timeline (all-times) time)
+    (container
+      (row
+        (cols
+          (card-listing "Places with stories at this time" link-to-place
+                        (map story-place stories-now))  
+          (card-listing "Characters with stories at this time" link-to-character
+                        (flatten (map story-characters stories-now)))  
+
+          (card-listing "Overlapping Times" link-to-time
+                        (filter 
+                          (curry times-overlap? 
+                                 #:lte moment<=?
+                                 #:gte moment>=? time) 
+                          (remove time (all-times))))
+
+          (card-listing "Stories during this time" link-to-story
+                        stories-now))))
+
     (data-wrap (time-data time))
-    (listing "Places with stories at this time" link-to-place
-             (map story-place stories-now))  
-    (listing "Characters with stories at this time" link-to-character
-             (flatten (map story-characters stories-now)))  
-
-    (listing "Overlapping Times" link-to-time
-             (filter 
-               (curry times-overlap? 
-                      #:lte moment<=?
-                      #:gte moment>=? time) 
-               (remove time (all-times))))
-
-    (listing "Stories during this time" link-to-story
-             stories-now)))
+    ))
 
 (define (render-character character)
   (define stories-about (filter-stories-by-character (all-stories) character))
   (list 
     (h1 (character-name character))
     
+    (row
+      (cols
+        (card-listing "Places character appears" link-to-place
+                      (map story-place stories-about))  
+        (card-listing "Related characters" link-to-character
+                      (remove character
+                              (remove-duplicates (flatten (map story-characters stories-about)))))  
+        (card-listing "Times character appears" link-to-time
+                      (map story-time stories-about))  
+        (card-listing "Stories about this character" link-to-story
+                      stories-about)))  
+    
+
     (data-wrap (character-data character))
-    (listing "Places character appears" link-to-place
-             (map story-place stories-about))  
-    (listing "Related characters" link-to-character
-             (remove character
-                     (remove-duplicates (flatten (map story-characters stories-about)))))  
-    (listing "Times character appears" link-to-time
-             (map story-time stories-about))  
-    (listing "Stories about this character" link-to-story
-             stories-about)  ))
+    ))
 
 (define (render-story story)
   (list 
-    (h1 (story-name story))
-    (h2 "Place")
-    (link-to-place (story-place story))  
-    (h2 "Time")
-    (link-to-time (story-time story))  
-    (listing "Characters" link-to-character
-             (story-characters story))
+    (container
+      class: "story-meta-data" 
+      (h1 (story-name story))
+      (row
+        (col-4
+          (card
+            (card-body
+              (card-title "Place")
+              (card-link
+                (link-to-place (story-place story))))))  
+        (col-4
+          (card
+            (card-body
+              (card-title "Time")
+              (card-link
+                (link-to-time (story-time story))))))  
+        (col-4
+          (card
+            (card-body
+              (listing (card-title "Characters") 
+                       link-to-character
+                       (story-characters story)))))))
     (data-wrap (story-data story))
     (listing "Linked Stories" link-to-story
              (story-links story))))
