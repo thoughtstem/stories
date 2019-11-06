@@ -5,6 +5,10 @@
          all-characters
          all-times
          all-stories
+         render-place
+         render-character
+         render-time
+         render-story
          listing)
 
 (require (except-in website/bootstrap time)
@@ -69,8 +73,7 @@
 
           (card-listing "Stories here" link-to-story stories-here)) ))
     
-    (data-wrap (place-data place))
-    )) 
+    (data-wrap (place-data place)))) 
 
 (define (render-time time)
   (define stories-now

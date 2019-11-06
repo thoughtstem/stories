@@ -1,6 +1,7 @@
 #lang racket
 
 (provide stories->site
+         (all-from-out "./rendering.rkt") 
          (all-from-out "./paths.rkt"))
 
 (require (except-in website/bootstrap time))
