@@ -30,22 +30,31 @@
         (last (explode-path path))
         ""))))
 
+
 (define-syntax (defines-from-directory stx)
+  (define (do-it dir wrap list-id (ns #'""))
+    (define files 
+      (glob (build-path 
+              (containing-directory (syntax-source stx))
+              (syntax->datum dir)
+              "*.rkt")))
+    (datum->syntax stx
+                   (syntax->datum
+                     #`(define/provide-list #,list-id
+                                            #,@(map 
+                                                 (lambda (f)
+                                                   (define n 
+                                                     (string->symbol
+                                                       (~a (syntax->datum ns) (file-name-only f)))) 
+                                                   #`(define #,n
+                                                       (#,wrap #,f)))
+                                                 files)))))
   (syntax-parse stx
     [(_ dir #:wrap-each wrap #:all-as-list list-id)
-     (define files 
-       (glob (build-path 
-               (containing-directory (syntax-source stx))
-               (syntax->datum #'dir)
-               "*.rkt")))
-     (datum->syntax stx
-                    (syntax->datum
-                      #`(define/provide-list list-id
-                                             #,@(map 
-                                                  (lambda (f)
-                                                    (define n (file-name-only f)) 
-                                                    #`(define #,n
-                                                        (wrap #,f)))
-                                                  files))))]))
+     (do-it #'dir #'wrap #'list-id)]
+    
+    [(_ dir #:wrap-each wrap #:all-as-list list-id #:ns ns)
+     (do-it #'dir #'wrap #'list-id #'ns)]
+    ))
 
 
